@@ -2,6 +2,7 @@ import { ROBOTS, formatPrice } from "../data/robots.js";
 import { addToCart } from "../cart.js";
 import { navTo } from "../router.js";
 import { initCardTilt } from "../utils/tilt.js";
+import { bindScrollReveal } from "../scroll-reveal.js";
 
 export function renderShop(root) {
   const minP = Math.min(...ROBOTS.map((r) => r.price));
@@ -18,6 +19,8 @@ export function renderShop(root) {
     "Clinical assistance",
     "Home assistance",
   ];
+
+  let teardownReveal = () => {};
 
   root.innerHTML = `
     <section class="section shop-page">
@@ -156,6 +159,11 @@ export function renderShop(root) {
     );
 
     initCardTilt(grid, ".tilt-card", ".tilt-card__inner");
+
+    // Re-bind scroll reveal after re-rendering cards (filters change content).
+    teardownReveal();
+    grid.querySelectorAll(".reveal").forEach((el) => el.classList.remove("is-visible"));
+    teardownReveal = bindScrollReveal(grid);
   }
 
   rMin.addEventListener("input", updateRangeUI);

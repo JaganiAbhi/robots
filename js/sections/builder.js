@@ -1,4 +1,5 @@
 import { formatPrice } from "../data/robots.js";
+import { bindScrollReveal } from "../scroll-reveal.js";
 
 const TYPES = [
   { id: "Industrial", label: "Industrial", desc: "Factory-grade power and throughput." },
@@ -7,7 +8,8 @@ const TYPES = [
   { id: "Personal", label: "Personal", desc: "Adaptive assistance for daily life." },
 ];
 
-const COLORS = ["#00d4ff", "#7b2fff", "#00ffb4", "#ff9f43", "#ff4d6d"];
+// Accent palette (no legacy blue) for the future-neon builder preview
+const COLORS = ["#3dffb5", "#ff4bd8", "#caff3d", "#ffb347", "#8a5cff"];
 
 function computePrice(state) {
   let p = 12000;
@@ -29,20 +31,20 @@ function previewSvg(state) {
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="${c}" stop-opacity="0.35"/>
-          <stop offset="100%" stop-color="#7b2fff" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#ff4bd8" stop-opacity="0.15"/>
         </linearGradient>
         <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
       <ellipse cx="100" cy="210" rx="70" ry="14" fill="url(#bg)" opacity="0.5"/>
       <g filter="url(#glow)">
-        <rect x="72" y="48" width="56" height="52" rx="10" fill="#0a1525" stroke="${c}" stroke-width="2"/>
+        <rect x="72" y="48" width="56" height="52" rx="10" fill="#0b0f2e" stroke="${c}" stroke-width="2"/>
         <rect x="84" y="58" width="32" height="10" rx="3" fill="${c}" opacity="0.6"/>
-        <rect x="78" y="100" width="44" height="56" rx="8" fill="#0d1828" stroke="${c}" stroke-width="1.5"/>
-        <rect x="52" y="72" width="18" height="48" rx="6" fill="#0d1828" stroke="${c}"/>
-        <rect x="130" y="72" width="18" height="48" rx="6" fill="#0d1828" stroke="${c}"/>
-        <rect x="70" y="158" width="22" height="52" rx="8" fill="#0d1828" stroke="${c}"/>
-        <rect x="108" y="158" width="22" height="52" rx="8" fill="#0d1828" stroke="${c}"/>
-        <circle cx="100" cy="40" r="18" fill="#0a1525" stroke="${c}" stroke-width="2"/>
+        <rect x="78" y="100" width="44" height="56" rx="8" fill="#0f133f" stroke="${c}" stroke-width="1.5"/>
+        <rect x="52" y="72" width="18" height="48" rx="6" fill="#0f133f" stroke="${c}"/>
+        <rect x="130" y="72" width="18" height="48" rx="6" fill="#0f133f" stroke="${c}"/>
+        <rect x="70" y="158" width="22" height="52" rx="8" fill="#0f133f" stroke="${c}"/>
+        <rect x="108" y="158" width="22" height="52" rx="8" fill="#0f133f" stroke="${c}"/>
+        <circle cx="100" cy="40" r="18" fill="#0b0f2e" stroke="${c}" stroke-width="2"/>
         <rect x="88" y="34" width="24" height="8" rx="2" fill="${c}" opacity="0.7"/>
       </g>
     </svg>
@@ -92,6 +94,7 @@ export function renderBuilder(root) {
   const nextBtn = root.querySelector("#b-next");
 
   let countAnim = null;
+  let teardownReveal = () => {};
 
   function animatePriceTo(n) {
     const start = performance.now();
@@ -123,16 +126,18 @@ export function renderBuilder(root) {
 
     if (state.step === 1) {
       body.innerHTML = `
-        <h3 class="step-title">Robot Type</h3>
-        <div class="type-grid" id="type-grid">
-          ${TYPES.map(
-            (t) => `
-            <button type="button" class="type-card ${state.type === t.id ? "is-selected" : ""}" data-type="${t.id}">
-              <span class="type-card__check">✓</span>
-              <h4>${t.label}</h4>
-              <p>${t.desc}</p>
-            </button>`
-          ).join("")}
+        <div class="reveal">
+          <h3 class="step-title">Robot Type</h3>
+          <div class="type-grid" id="type-grid">
+            ${TYPES.map(
+              (t) => `
+              <button type="button" class="type-card ${state.type === t.id ? "is-selected" : ""}" data-type="${t.id}">
+                <span class="type-card__check">✓</span>
+                <h4>${t.label}</h4>
+                <p>${t.desc}</p>
+              </button>`
+            ).join("")}
+          </div>
         </div>
       `;
       body.querySelectorAll(".type-card").forEach((btn) => {
@@ -145,22 +150,24 @@ export function renderBuilder(root) {
       });
     } else if (state.step === 2) {
       body.innerHTML = `
-        <h3 class="step-title">Features</h3>
-        <div class="toggle-row">
-          <span>AI Vision</span>
-          <button type="button" class="toggle-switch ${state.vision ? "is-on" : ""}" id="tog-vision" aria-pressed="${state.vision}"></button>
-        </div>
-        <div class="toggle-row">
-          <span>Voice Control</span>
-          <button type="button" class="toggle-switch ${state.voice ? "is-on" : ""}" id="tog-voice" aria-pressed="${state.voice}"></button>
-        </div>
-        <div class="toggle-row">
-          <span>Mobility Level</span>
-          <button type="button" class="toggle-switch ${state.mobility ? "is-on" : ""}" id="tog-mob" aria-pressed="${state.mobility}"></button>
-        </div>
-        <div class="range-wrap">
-          <label><span>AI Processing Level</span><span id="ai-lvl-lbl">${state.aiLevel}</span></label>
-          <input type="range" class="glow-range" id="ai-range" min="1" max="5" value="${state.aiLevel}" />
+        <div class="reveal">
+          <h3 class="step-title">Features</h3>
+          <div class="toggle-row">
+            <span>AI Vision</span>
+            <button type="button" class="toggle-switch ${state.vision ? "is-on" : ""}" id="tog-vision" aria-pressed="${state.vision}"></button>
+          </div>
+          <div class="toggle-row">
+            <span>Voice Control</span>
+            <button type="button" class="toggle-switch ${state.voice ? "is-on" : ""}" id="tog-voice" aria-pressed="${state.voice}"></button>
+          </div>
+          <div class="toggle-row">
+            <span>Mobility Level</span>
+            <button type="button" class="toggle-switch ${state.mobility ? "is-on" : ""}" id="tog-mob" aria-pressed="${state.mobility}"></button>
+          </div>
+          <div class="range-wrap">
+            <label><span>AI Processing Level</span><span id="ai-lvl-lbl">${state.aiLevel}</span></label>
+            <input type="range" class="glow-range" id="ai-range" min="1" max="5" value="${state.aiLevel}" />
+          </div>
         </div>
       `;
       const bindToggle = (id, key) => {
@@ -184,20 +191,22 @@ export function renderBuilder(root) {
       });
     } else if (state.step === 3) {
       body.innerHTML = `
-        <h3 class="step-title">Appearance</h3>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0;">Accent color</p>
-        <div class="swatches" id="swatches">
-          ${COLORS.map(
-            (c, i) =>
-              `<button type="button" class="swatch ${state.color === c ? "is-active" : ""}" style="background:${c}" data-color="${c}" aria-label="Color ${i + 1}"></button>`
-          ).join("")}
-        </div>
-        <p style="font-size:0.85rem;color:var(--text-muted);">Finish</p>
-        <div class="finish-tabs" id="finish-tabs">
-          ${["Matte", "Glossy", "Carbon"].map(
-            (f) =>
-              `<button type="button" class="${state.finish === f ? "is-active" : ""}" data-finish="${f}">${f}</button>`
-          ).join("")}
+        <div class="reveal">
+          <h3 class="step-title">Appearance</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0;">Accent color</p>
+          <div class="swatches" id="swatches">
+            ${COLORS.map(
+              (c, i) =>
+                `<button type="button" class="swatch ${state.color === c ? "is-active" : ""}" style="background:${c}" data-color="${c}" aria-label="Color ${i + 1}"></button>`
+            ).join("")}
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Finish</p>
+          <div class="finish-tabs" id="finish-tabs">
+            ${["Matte", "Glossy", "Carbon"].map(
+              (f) =>
+                `<button type="button" class="${state.finish === f ? "is-active" : ""}" data-finish="${f}">${f}</button>`
+            ).join("")}
+          </div>
         </div>
       `;
       body.querySelectorAll(".swatch").forEach((sw) => {
@@ -217,22 +226,30 @@ export function renderBuilder(root) {
     } else {
       const p = computePrice(state);
       body.innerHTML = `
-        <h3 class="step-title">Summary</h3>
-        <div class="summary-lines">
-          <div><span>Type</span><span>${state.type}</span></div>
-          <div><span>AI Vision</span><span>${state.vision ? "Yes" : "No"}</span></div>
-          <div><span>Voice</span><span>${state.voice ? "Yes" : "No"}</span></div>
-          <div><span>Mobility</span><span>${state.mobility ? "Yes" : "No"}</span></div>
-          <div><span>AI Level</span><span>${state.aiLevel}</span></div>
-          <div><span>Finish</span><span>${state.finish}</span></div>
-          <div><span>Total</span><span>${formatPrice(p)}</span></div>
+        <div class="reveal">
+          <h3 class="step-title">Summary</h3>
+          <div class="summary-lines">
+            <div><span>Type</span><span>${state.type}</span></div>
+            <div><span>AI Vision</span><span>${state.vision ? "Yes" : "No"}</span></div>
+            <div><span>Voice</span><span>${state.voice ? "Yes" : "No"}</span></div>
+            <div><span>Mobility</span><span>${state.mobility ? "Yes" : "No"}</span></div>
+            <div><span>AI Level</span><span>${state.aiLevel}</span></div>
+            <div><span>Finish</span><span>${state.finish}</span></div>
+            <div><span>Total</span><span>${formatPrice(p)}</span></div>
+          </div>
+          <button type="button" class="btn-gradient full cta-glow-pulse" id="b-submit">Submit Order</button>
         </div>
-        <button type="button" class="btn-gradient full cta-glow-pulse" id="b-submit">Submit Order</button>
       `;
       body.querySelector("#b-submit")?.addEventListener("click", () => {
         alert("Thank you. A NEXUS specialist will contact you within one business day to confirm configuration and delivery.");
       });
     }
+
+    // Re-animate step body when content changes
+    teardownReveal();
+    body.querySelectorAll(".reveal").forEach((el) => el.classList.remove("is-visible"));
+    teardownReveal = bindScrollReveal(body);
+
     preview.innerHTML = previewSvg(state);
   }
 

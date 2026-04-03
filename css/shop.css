@@ -179,7 +179,7 @@
 .shop-card__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(2, 4, 8, 0.75);
+  background: radial-gradient(circle at 50% 40%, rgba(61, 255, 181, 0.12), rgba(11, 15, 46, 0.88));
   display: grid;
   place-items: center;
   opacity: 0;
@@ -359,5 +359,12 @@
   }
   .shop-filters.is-open {
     display: block;
+  }
+
+  /* On touch screens there is no reliable hover, so keep Quick View tappable */
+  .shop-card__overlay {
+    opacity: 1;
+    pointer-events: auto;
+    background: transparent;
   }
 }

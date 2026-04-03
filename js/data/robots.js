@@ -135,5 +135,5 @@ export function getRobotById(id) {
 }
 
 export function formatPrice(n) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  return n.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 }
