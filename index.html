@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS — Intelligence. Embodied.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet" />
+  <!-- Single stylesheet — works from file:// when opened next to this folder -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+  <div id="cursor-orb" class="cursor-orb" aria-hidden="true"></div>
+  <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-inner">
+      <a href="#/" class="wordmark" data-link>
+        <span class="wordmark-dot" aria-hidden="true"></span>
+        NEXUS
+      </a>
+      <nav class="nav-center" aria-label="Primary">
+        <a href="#/" data-link>Home</a>
+        <a href="#/robots" data-link>Robots</a>
+        <a href="#/shop" data-link>Shop</a>
+        <a href="#/builder" data-link>Builder</a>
+        <a href="#/faq" data-link>FAQ</a>
+      </nav>
+      <div class="nav-right">
+        <button type="button" class="cart-btn" id="cart-btn" aria-label="Open cart">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 6h15l-1.5 9h-12z" />
+            <circle cx="9" cy="20" r="1.5" />
+            <circle cx="18" cy="20" r="1.5" />
+            <path d="M6 6 5 3H2" />
+          </svg>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </button>
+        <a href="#/builder" class="btn-nav-cta" data-link>Get Started</a>
+        <button type="button" class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-overlay" id="mobile-overlay" hidden>
+      <nav class="mobile-nav" aria-label="Mobile">
+        <a href="#/" data-link>Home</a>
+        <a href="#/robots" data-link>Robots</a>
+        <a href="#/shop" data-link>Shop</a>
+        <a href="#/builder" data-link>Builder</a>
+        <a href="#/faq" data-link>FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="app-main"></main>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer__backdrop" id="cart-backdrop"></div>
+    <div class="cart-drawer__panel">
+      <div class="cart-drawer__head">
+        <h2>Your Cart</h2>
+        <button type="button" class="cart-close" id="cart-close" aria-label="Close cart">×</button>
+      </div>
+      <div class="cart-drawer__body" id="cart-drawer-body"></div>
+      <div class="cart-drawer__foot">
+        <p class="cart-total"><span>Total</span> <strong id="cart-total-price">$0</strong></p>
+        <button type="button" class="btn-gradient full" id="cart-checkout">Checkout</button>
+      </div>
+    </div>
+  </aside>
+
+  <footer class="site-footer">
+    <div class="footer-gradient-line"></div>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">NEXUS</div>
+        <p class="footer-tag">Intelligence. Embodied.</p>
+        <div class="social-row">
+          <a href="#" aria-label="LinkedIn">in</a>
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <a href="#/robots" data-link>Robot lineup</a>
+        <a href="#/shop" data-link>Shop</a>
+        <a href="#/builder" data-link>Custom builder</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#/faq" data-link>Support &amp; FAQ</a>
+        <a href="#/robots" data-link>Enterprise</a>
+        <a href="#/shop" data-link>Financing</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Compliance</a>
+      </div>
+    </div>
+    <p class="footer-copy">© 2025 NEXUS Robotics. All rights reserved.</p>
+  </footer>
+
+  <!-- Global THREE (classic script) — required for hero WebGL -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" crossorigin="anonymous"></script>
+  <!-- ES module app entry (works over http://127.0.0.1:5500) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" fill="none">
+  <defs>
+    <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffc878"/>
+      <stop offset="100%" stop-color="#ff9f43"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="160" cy="360" rx="90" ry="14" fill="rgba(255,159,67,0.2)"/>
+  <circle cx="160" cy="95" r="46" fill="#121a28" stroke="url(#cg)" stroke-width="3"/>
+  <path d="M130 78 Q160 88 190 78" stroke="#ffc878" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <rect x="125" y="145" width="70" height="85" rx="16" fill="#151f2e" stroke="url(#cg)" stroke-width="2"/>
+  <circle cx="145" cy="175" r="6" fill="#ffc878" opacity="0.7"/>
+  <circle cx="175" cy="175" r="6" fill="#ffc878" opacity="0.7"/>
+  <rect x="95" y="155" width="22" height="70" rx="10" fill="#151f2e" stroke="#ff9f43"/>
+  <rect x="203" y="155" width="22" height="70" rx="10" fill="#151f2e" stroke="#ff9f43"/>
+  <rect x="138" y="235" width="44" height="95" rx="14" fill="#151f2e" stroke="url(#cg)"/>
+  <ellipse cx="160" cy="345" rx="34" ry="12" fill="#121a28" stroke="#ffc878"/>
+</svg>

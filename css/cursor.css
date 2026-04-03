@@ -1,0 +1,29 @@
+.cursor-orb {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 12px var(--accent-blue), 0 0 24px rgba(61, 255, 181, 0.6);
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.cursor-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  border: 1px solid rgba(61, 255, 181, 0.25);
+  background: radial-gradient(circle, rgba(61, 255, 181, 0.12) 0%, transparent 70%);
+  z-index: 9998;
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
