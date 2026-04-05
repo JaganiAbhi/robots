@@ -76,7 +76,7 @@ export function renderFaq(root) {
     const id = "load-" + Date.now();
     chat.insertAdjacentHTML(
       "beforeend",
-      `<div class="chat-msg chat-msg--ai" id="${id}"><div class="chat-avatar" aria-hidden="true"></div><div class="chat-bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>`
+      `<div class="chat-msg chat-msg--ai" id="${id}"><div class="chat-avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 4 L34 12 L34 28 L20 36 L6 28 L6 12 Z" stroke="url(#nexus-grad1)" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20 L20 36 M20 20 L34 12 M20 20 L6 12" stroke="url(#nexus-grad2)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="chat-bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>`
     );
     return id;
   }
@@ -84,7 +84,7 @@ export function renderFaq(root) {
   function replaceLoading(id, text) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerHTML = `<div class="chat-avatar" aria-hidden="true"></div><div class="chat-bubble"><div class="chat-meta">NEXUS AI</div>${escapeHtml(text)}</div>`;
+    el.innerHTML = `<div class="chat-avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 4 L34 12 L34 28 L20 36 L6 28 L6 12 Z" stroke="url(#nexus-grad1)" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20 L20 36 M20 20 L34 12 M20 20 L6 12" stroke="url(#nexus-grad2)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="chat-bubble"><div class="chat-meta">NEXUS AI</div>${escapeHtml(text)}</div>`;
   }
 
   function escapeHtml(s) {
