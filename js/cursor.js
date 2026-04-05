@@ -4,7 +4,7 @@
 export function initCursor() {
   const orb = document.getElementById("cursor-orb");
   const glow = document.getElementById("cursor-glow");
-  if (!orb || !glow || window.matchMedia("(max-width: 900px)").matches) return () => {};
+  if (!orb || !glow) return () => {};
 
   let mx = window.innerWidth / 2;
   let my = window.innerHeight / 2;

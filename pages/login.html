@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NanoNinja - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../css/additions.css" />
+    <script>
+      (function () {
+        function safeToast(msg, type) {
+          try {
+            if (typeof window.showToast === 'function') window.showToast(msg, type || 'error');
+          } catch (e) {}
+        }
+
+        window.addEventListener('error', function (e) {
+          safeToast('Something went wrong. Please try again.', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function () {
+          safeToast('Something went wrong. Please try again.', 'error');
+        });
+
+        window.addEventListener('offline', function () {
+          safeToast('You are offline. Check your connection.', 'warning');
+        });
+
+        window.addEventListener('online', function () {
+          // Keep quiet to avoid spamming toasts.
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div id="cursor-orb" class="cursor-orb" aria-hidden="true"></div>
+    <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
+    <noscript><p>JavaScript is required to use NanoNinja. Please enable it.</p></noscript>
+
+    <main class="nn-auth-page">
+      <article class="nn-auth-card">
+        <header>
+          <h1 class="nn-auth-heading">NanoNinja</h1>
+          <p class="nn-auth-sub">Welcome back</p>
+        </header>
+
+        <form id="loginForm" novalidate>
+          <div class="nn-form-group">
+            <label class="nn-form-label" for="loginEmail">Email</label>
+            <input class="nn-form-input" type="email" id="loginEmail" name="email" autocomplete="email" required />
+          </div>
+
+          <div class="nn-form-group">
+            <label class="nn-form-label" for="loginPassword">Password</label>
+            <div class="nn-password-field">
+              <input
+                class="nn-form-input"
+                type="password"
+                id="loginPassword"
+                name="password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="nn-password-toggle" id="loginPasswordToggle" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div>
+            <a href="./forgot-password.html">Forgot password?</a>
+          </div>
+
+          <button class="nn-btn-primary" type="submit" id="loginBtn">Login</button>
+
+          <p>or</p>
+
+          <p>
+            Don't have an account?
+            <a href="./signup.html">Sign up</a>
+          </p>
+        </form>
+      </article>
+    </main>
+
+    <script src="../js/nn-auth/config.js"></script>
+    <script src="../js/nn-auth/utils.js"></script>
+    <script src="../js/nn-auth/auth.js"></script>
+    <script src="../js/nn-auth/api.js"></script>
+
+    <script type="module">
+      import { initCursor } from "../js/cursor.js";
+      import { initStarfield } from "../js/starfield.js";
+      try {
+        window.addEventListener("DOMContentLoaded", () => {
+          initCursor();
+          initStarfield();
+        });
+      } catch (e) {}
+    </script>
+
+    <script>
+      redirectIfLoggedIn();
+
+      const emailInput = document.getElementById('loginEmail');
+      const passwordInput = document.getElementById('loginPassword');
+      const toggleBtn = document.getElementById('loginPasswordToggle');
+
+      if (emailInput) {
+        emailInput.addEventListener('input', function () {
+          clearFieldError('loginEmail');
+        });
+      }
+      if (passwordInput) {
+        passwordInput.addEventListener('input', function () {
+          clearFieldError('loginPassword');
+        });
+      }
+
+      function togglePasswordVisibility(e) {
+        try {
+          if (e) e.preventDefault();
+          if (!toggleBtn || !passwordInput) return;
+          const isHidden = passwordInput.getAttribute('type') === 'password';
+          passwordInput.setAttribute('type', isHidden ? 'text' : 'password');
+          toggleBtn.textContent = isHidden ? 'Hide' : 'Show';
+          toggleBtn.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        } catch (err) {
+          // ignore
+        }
+      }
+
+      if (toggleBtn && passwordInput) {
+        // pointerdown makes it feel instant on some browsers
+        toggleBtn.addEventListener('pointerdown', togglePasswordVisibility);
+        toggleBtn.addEventListener('click', togglePasswordVisibility);
+      }
+
+      const form = document.getElementById('loginForm');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        clearAllErrors('loginForm');
+
+        const email = (emailInput.value || '').trim();
+        const password = passwordInput.value || '';
+
+        const result = validateFields([
+          { id: 'loginEmail', label: 'Email', required: true, type: 'email' },
+          { id: 'loginPassword', label: 'Password', required: true }
+        ]);
+
+        if (!result.valid) {
+          result.errors.forEach(err => showFieldError(err.id, err.message));
+          const first = result.errors[0];
+          const el = document.getElementById(first.id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.focus();
+          }
+          return;
+        }
+
+        setButtonLoading('loginBtn', true, 'Login');
+        try {
+          const data = await login(email, password);
+          if (!data) return; // redirected due to 401
+
+          saveAuth(data.token, data.user);
+          showToast('Welcome back, ' + data.user.name, 'success');
+          window.location.href =
+            (window.CONFIG && window.CONFIG.AUTH_PREFIX ? window.CONFIG.AUTH_PREFIX : '') + '/pages/dashboard.html';
+        } catch (err) {
+          setButtonLoading('loginBtn', false, 'Login');
+          const msg = err && err.message ? err.message : String(err);
+
+          if (msg === 'Invalid email or password') {
+            showFieldError('loginEmail', 'Invalid email or password');
+            return;
+          }
+
+          if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connection')) {
+            showToast('Network error. Check your connection.', 'error');
+            return;
+          }
+
+          showToast(msg, 'error');
+        }
+      });
+    </script>
+  </body>
+</html>
+

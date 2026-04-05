@@ -1,5 +1,16 @@
-import { formatPrice } from "../data/robots.js";
+import { Application } from 'https://esm.sh/@splinetool/runtime@1.9.46';
+import { formatPrice, ROBOTS } from "../data/robots.js";
 import { bindScrollReveal } from "../scroll-reveal.js";
+import { addToCart } from "../cart.js";
+
+let builderSplineApp = null;
+
+export function destroyBuilder() {
+  if (builderSplineApp) {
+    builderSplineApp.dispose();
+    builderSplineApp = null;
+  }
+}
 
 const TYPES = [
   { id: "Industrial", label: "Industrial", desc: "Factory-grade power and throughput." },
@@ -24,33 +35,6 @@ function computePrice(state) {
   return p;
 }
 
-function previewSvg(state) {
-  const c = state.color;
-  return `
-    <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${c}" stop-opacity="0.35"/>
-          <stop offset="100%" stop-color="#ff4bd8" stop-opacity="0.15"/>
-        </linearGradient>
-        <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <ellipse cx="100" cy="210" rx="70" ry="14" fill="url(#bg)" opacity="0.5"/>
-      <g filter="url(#glow)">
-        <rect x="72" y="48" width="56" height="52" rx="10" fill="#0b0f2e" stroke="${c}" stroke-width="2"/>
-        <rect x="84" y="58" width="32" height="10" rx="3" fill="${c}" opacity="0.6"/>
-        <rect x="78" y="100" width="44" height="56" rx="8" fill="#0f133f" stroke="${c}" stroke-width="1.5"/>
-        <rect x="52" y="72" width="18" height="48" rx="6" fill="#0f133f" stroke="${c}"/>
-        <rect x="130" y="72" width="18" height="48" rx="6" fill="#0f133f" stroke="${c}"/>
-        <rect x="70" y="158" width="22" height="52" rx="8" fill="#0f133f" stroke="${c}"/>
-        <rect x="108" y="158" width="22" height="52" rx="8" fill="#0f133f" stroke="${c}"/>
-        <circle cx="100" cy="40" r="18" fill="#0b0f2e" stroke="${c}" stroke-width="2"/>
-        <rect x="88" y="34" width="24" height="8" rx="2" fill="${c}" opacity="0.7"/>
-      </g>
-    </svg>
-  `;
-}
-
 export function renderBuilder(root) {
   const state = {
     type: "Industrial",
@@ -63,8 +47,16 @@ export function renderBuilder(root) {
     step: 1,
   };
 
+  destroyBuilder();
+
   root.innerHTML = `
-    <section class="section builder-page">
+    <div class="page-shell page-shell--builder">
+      <header class="page-intro reveal">
+        <p class="page-eyebrow">Config Studio</p>
+        <h1 class="page-title">Design your deployment</h1>
+        <p class="page-lede">Pick a platform class, tune perception and compute, then lock finishes. Your spec syncs to NEXUS manufacturing.</p>
+      </header>
+    <section class="section builder-page section--tight-top">
       <div class="builder-panel reveal">
         <div class="progress-wrap">
           <p style="margin:0 0 0.5rem;font-size:0.8rem;color:var(--text-muted);">Step <span id="b-step-num">1</span> of 4</p>
@@ -76,13 +68,18 @@ export function renderBuilder(root) {
           <button type="button" id="b-next">Next</button>
         </div>
       </div>
-      <div class="builder-preview reveal">
-        <h3 style="margin:0;font-size:1rem;">Your Build</h3>
-        <div class="builder-preview__svg-wrap" id="b-preview-svg"></div>
-        <div class="price-badge" id="b-price">${formatPrice(computePrice(state))}</div>
-        <p class="delivery-badge">Estimated Delivery: 6–8 weeks</p>
+      <div class="builder-preview reveal" style="display:flex; flex-direction:column; align-items:center; justify-content:space-between; text-align:center;">
+        <h3 style="margin:0;font-size:1.1rem;font-weight:700;">Your Build</h3>
+        <div class="builder-preview__svg-wrap" id="b-preview-svg" style="width:100%; position:relative; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+          <canvas id="builder-spline-canvas" style="width:100%; height:100%; min-height:280px; outline:none; cursor:grab; transform:scale(1) translate(0%, 0%); transform-origin:center;"></canvas>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;margin-top:1rem;">
+          <div class="price-badge" id="b-price" style="font-size:2.4rem; font-weight:800; margin-bottom:0.75rem; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; color: transparent;">${formatPrice(computePrice(state))}</div>
+          <p class="delivery-badge" style="margin:0; font-size:0.75rem;">Estimated Delivery: 6–8 weeks</p>
+        </div>
       </div>
     </section>
+    </div>
   `;
 
   const body = root.querySelector("#b-step-body");
@@ -94,7 +91,16 @@ export function renderBuilder(root) {
   const nextBtn = root.querySelector("#b-next");
 
   let countAnim = null;
-  let teardownReveal = () => {};
+  let teardownReveal = () => { };
+
+  const canvas = root.querySelector("#builder-spline-canvas");
+  if (canvas) {
+    builderSplineApp = new Application(canvas);
+    builderSplineApp
+      .load("https://prod.spline.design/aESCGDxIj7wccJim/scene.splinecode")
+      .then(() => console.log("Builder Spline loaded"))
+      .catch((err) => console.warn("Builder Spline failed:", err));
+  }
 
   function animatePriceTo(n) {
     const start = performance.now();
@@ -130,13 +136,13 @@ export function renderBuilder(root) {
           <h3 class="step-title">Robot Type</h3>
           <div class="type-grid" id="type-grid">
             ${TYPES.map(
-              (t) => `
+        (t) => `
               <button type="button" class="type-card ${state.type === t.id ? "is-selected" : ""}" data-type="${t.id}">
                 <span class="type-card__check">✓</span>
                 <h4>${t.label}</h4>
                 <p>${t.desc}</p>
               </button>`
-            ).join("")}
+      ).join("")}
           </div>
         </div>
       `;
@@ -145,7 +151,6 @@ export function renderBuilder(root) {
           state.type = btn.dataset.type;
           renderStep();
           refreshPrice();
-          preview.innerHTML = previewSvg(state);
         });
       });
     } else if (state.step === 2) {
@@ -196,16 +201,16 @@ export function renderBuilder(root) {
           <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0;">Accent color</p>
           <div class="swatches" id="swatches">
             ${COLORS.map(
-              (c, i) =>
-                `<button type="button" class="swatch ${state.color === c ? "is-active" : ""}" style="background:${c}" data-color="${c}" aria-label="Color ${i + 1}"></button>`
-            ).join("")}
+        (c, i) =>
+          `<button type="button" class="swatch ${state.color === c ? "is-active" : ""}" style="background:${c}" data-color="${c}" aria-label="Color ${i + 1}"></button>`
+      ).join("")}
           </div>
           <p style="font-size:0.85rem;color:var(--text-muted);">Finish</p>
           <div class="finish-tabs" id="finish-tabs">
             ${["Matte", "Glossy", "Carbon"].map(
-              (f) =>
-                `<button type="button" class="${state.finish === f ? "is-active" : ""}" data-finish="${f}">${f}</button>`
-            ).join("")}
+        (f) =>
+          `<button type="button" class="${state.finish === f ? "is-active" : ""}" data-finish="${f}">${f}</button>`
+      ).join("")}
           </div>
         </div>
       `;
@@ -213,7 +218,9 @@ export function renderBuilder(root) {
         sw.addEventListener("click", () => {
           state.color = sw.dataset.color;
           body.querySelectorAll(".swatch").forEach((s) => s.classList.toggle("is-active", s.dataset.color === state.color));
-          preview.innerHTML = previewSvg(state);
+          if (builderSplineApp) {
+            builderSplineApp.setVariable("color", state.color);
+          }
         });
       });
       body.querySelectorAll("#finish-tabs button").forEach((fb) => {
@@ -241,7 +248,14 @@ export function renderBuilder(root) {
         </div>
       `;
       body.querySelector("#b-submit")?.addEventListener("click", () => {
-        alert("Thank you. A NEXUS specialist will contact you within one business day to confirm configuration and delivery.");
+        const customId = "custom-" + Date.now();
+        ROBOTS.push({
+          id: customId,
+          name: `Custom ${state.type} Model`,
+          price: p
+        });
+        addToCart(customId, 1);
+        document.getElementById("cart-btn")?.click();
       });
     }
 
@@ -249,8 +263,6 @@ export function renderBuilder(root) {
     teardownReveal();
     body.querySelectorAll(".reveal").forEach((el) => el.classList.remove("is-visible"));
     teardownReveal = bindScrollReveal(body);
-
-    preview.innerHTML = previewSvg(state);
   }
 
   prevBtn.addEventListener("click", () => {

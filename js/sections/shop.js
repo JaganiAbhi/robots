@@ -125,16 +125,18 @@ export function renderShop(root) {
         (r) => `
       <article class="shop-card tilt-card reveal" data-id="${r.id}">
         <div class="shop-card__inner tilt-card__inner">
-          <span class="robot-card__badge ${r.badgeClass}">${r.category}</span>
-          <div class="robot-card__img-wrap" style="height:140px;">
-            <img src="${r.image}" alt="" width="160" height="160" loading="lazy" />
+          <div class="robot-card__img-wrap shop-card__img-wrap">
+            <span class="robot-card__badge ${r.badgeClass}">${r.category}</span>
+            <img src="${r.image}" alt="" loading="lazy" />
           </div>
-          <h3 style="font-size:1.1rem;margin:0.5rem 0 0;">${r.name}</h3>
-          <div class="shop-card__price">${formatPrice(r.price)}</div>
-          <div class="shop-card__quick">${r.shopQuick.map((s) => `• ${s}`).join("<br/>")}</div>
-          <div class="shop-card__actions">
-            <button type="button" class="btn-add" data-add="${r.id}">Add to Cart</button>
-            <button type="button" class="btn-buy" data-buy="${r.id}">Buy Now</button>
+          <div class="shop-card__content">
+            <h3>${r.name}</h3>
+            <div class="shop-card__price">${formatPrice(r.price)}</div>
+            <div class="shop-card__quick">${r.shopQuick.map((s) => `• ${s}`).join("<br/>")}</div>
+            <div class="shop-card__actions">
+              <button type="button" class="btn-add" data-add="${r.id}">Add to Cart</button>
+              <button type="button" class="btn-buy" data-buy="${r.id}">Buy Now</button>
+            </div>
           </div>
           <div class="shop-card__overlay">
             <button type="button" class="btn-outline-glass" data-quick="${r.id}">Quick View</button>

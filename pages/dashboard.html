@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NanoNinja - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../css/additions.css" />
+    <script>
+      (function () {
+        function safeToast(msg, type) {
+          try {
+            if (typeof window.showToast === 'function') window.showToast(msg, type || 'error');
+          } catch (e) {}
+        }
+        window.addEventListener('unhandledrejection', function () {
+          safeToast('Something went wrong. Please try again.', 'error');
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div id="cursor-orb" class="cursor-orb" aria-hidden="true"></div>
+    <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
+    <noscript><p>JavaScript is required to use NanoNinja. Please enable it.</p></noscript>
+
+    <header>
+      <nav aria-label="Primary">
+        <a id="loginLink" href="./login.html">Login</a>
+        <a id="dashboardLink" href="./dashboard.html">Dashboard</a>
+        <a id="adminLink" href="./admin.html">Admin</a>
+        <button id="logoutBtn" type="button">Logout</button>
+        <span>Hello, <strong id="greetingName"></strong></span>
+      </nav>
+    </header>
+
+    <main class="nn-dashboard">
+      <section class="nn-welcome-banner">
+        <h2>Hello, <span id="dashName"></span></h2>
+        <span id="roleBadge" class="nn-role-badge">visitor</span>
+      </section>
+
+      <section>
+        <h3 class="nn-section-heading">Profile</h3>
+
+        <div class="nn-stat-card">
+          <div>
+            <div><strong>Name:</strong> <span id="userName"></span></div>
+            <div><strong>Email:</strong> <span id="userEmail"></span></div>
+            <div><strong>Company:</strong> <span id="userCompany"></span></div>
+            <div><strong>Phone:</strong> <span id="userPhone"></span></div>
+            <div><strong>Designation:</strong> <span id="userDesignation"></span></div>
+            <div><strong>GST:</strong> <span id="userGST"></span></div>
+          </div>
+
+          <div>
+            <button type="button" class="nn-btn-primary" id="editProfileBtn">Edit profile</button>
+          </div>
+        </div>
+
+        <div id="editProfileWrap" hidden>
+          <h3 class="nn-section-heading">Edit profile</h3>
+          <form id="editProfileForm" novalidate>
+            <div class="nn-two-col">
+              <div class="nn-form-group">
+                <label class="nn-form-label" for="editName">Name</label>
+                <input class="nn-form-input" type="text" id="editName" />
+              </div>
+              <div class="nn-form-group">
+                <label class="nn-form-label" for="editPhone">Phone</label>
+                <input class="nn-form-input" type="text" id="editPhone" inputmode="numeric" />
+              </div>
+            </div>
+
+            <div class="nn-two-col">
+              <div class="nn-form-group">
+                <label class="nn-form-label" for="editCompany">Company</label>
+                <input class="nn-form-input" type="text" id="editCompany" />
+              </div>
+              <div class="nn-form-group">
+                <label class="nn-form-label" for="editDesignation">Designation</label>
+                <input class="nn-form-input" type="text" id="editDesignation" />
+              </div>
+            </div>
+
+            <div class="nn-form-group">
+              <label class="nn-form-label" for="editGST">GST</label>
+              <input class="nn-form-input" type="text" id="editGST" />
+            </div>
+
+            <div>
+              <button type="button" class="nn-btn-primary" id="cancelEditBtn">Cancel</button>
+              <button type="submit" class="nn-btn-primary" id="saveProfileBtn">Save</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="nn-stats-row">
+        <div class="nn-stat-card">
+          <div>0</div>
+          <div>Orders</div>
+        </div>
+        <div class="nn-stat-card">
+          <div>0</div>
+          <div>Bookings</div>
+        </div>
+        <div class="nn-stat-card">
+          <div>0</div>
+          <div>Saved Robots</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="nn-section-heading">My Orders</h3>
+        <div class="nn-empty-state">No orders yet</div>
+      </section>
+
+      <section>
+        <h3 class="nn-section-heading">My Bookings</h3>
+        <div class="nn-empty-state">No bookings yet</div>
+      </section>
+    </main>
+
+    <script src="../js/nn-auth/config.js"></script>
+    <script src="../js/nn-auth/utils.js"></script>
+    <script src="../js/nn-auth/auth.js"></script>
+    <script src="../js/nn-auth/api.js"></script>
+
+    <script type="module">
+      import { initCursor } from "../js/cursor.js";
+      import { initStarfield } from "../js/starfield.js";
+      try {
+        window.addEventListener("DOMContentLoaded", () => {
+          initCursor();
+          initStarfield();
+        });
+      } catch (e) {}
+    </script>
+
+    <script>
+      const authed = checkAuth();
+      if (!authed) {
+        // checkAuth redirects
+      }
+
+      updateNavbar();
+
+      function setRoleBadge(role) {
+        const badge = document.getElementById('roleBadge');
+        if (!badge) return;
+        badge.textContent = role || 'visitor';
+        // Set role-specific colors via inline style (keeps additions.css minimal).
+        const r = role || 'visitor';
+        const map = {
+          visitor: 'rgba(59, 130, 246, 0.15)',
+          customer: 'rgba(16, 185, 129, 0.15)',
+          admin: 'rgba(217, 70, 239, 0.15)'
+        };
+        badge.style.background = map[r] || map.visitor;
+      }
+
+      function fillUser(u) {
+        if (!u) return;
+        const set = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val || '-';
+        };
+        set('dashName', u.name);
+        set('userName', u.name);
+        set('userEmail', u.email);
+        set('userCompany', u.company);
+        set('userPhone', u.phone);
+        set('userDesignation', u.designation);
+        set('userGST', u.gst);
+        setRoleBadge(u.role);
+      }
+
+      // Prefer local storage for instant UI, only refetch if key fields missing.
+      const localUser = getUser();
+      fillUser(localUser);
+
+      async function refreshIfNeeded() {
+        try {
+          if (!localUser) return;
+          const missing = !localUser.phone || localUser.company === undefined || localUser.gst === undefined || localUser.designation === undefined;
+          if (!missing) return;
+
+          const data = await getMe();
+          if (!data) return;
+          fillUser(data.user);
+          saveAuth(getToken(), data.user);
+        } catch (err) {
+          const msg = err && err.message ? err.message : String(err);
+          if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connection')) {
+            showToast('Network error. Check your connection.', 'error');
+            return;
+          }
+          showToast(msg, 'error');
+        }
+      }
+
+      refreshIfNeeded();
+
+      const editBtn = document.getElementById('editProfileBtn');
+      const editWrap = document.getElementById('editProfileWrap');
+      const cancelBtn = document.getElementById('cancelEditBtn');
+      const form = document.getElementById('editProfileForm');
+
+      function populateEditForm(u) {
+        if (!u) return;
+        const set = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val || '';
+        };
+        set('editName', u.name);
+        set('editPhone', u.phone);
+        set('editCompany', u.company);
+        set('editDesignation', u.designation);
+        set('editGST', u.gst);
+      }
+
+      if (editBtn && form) {
+        editBtn.addEventListener('click', function () {
+          editWrap.hidden = false;
+          populateEditForm(getUser());
+          editBtn.hidden = true;
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+          if (editWrap) editWrap.hidden = true;
+          if (editBtn) editBtn.hidden = false;
+          clearAllErrors('editProfileForm');
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          clearAllErrors('editProfileForm');
+
+          const result = validateFields([
+            { id: 'editName', label: 'Name', required: false, maxLength: 50 },
+            { id: 'editPhone', label: 'Phone', required: false, type: 'phone' }
+          ]);
+
+          // server-side might require at least one field, but we allow saving partial updates
+          if (!result.valid) {
+            result.errors.forEach(err => showFieldError(err.id, err.message));
+            const first = result.errors[0];
+            const el = document.getElementById(first.id);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.focus();
+            }
+            return;
+          }
+
+          const payload = {
+            name: document.getElementById('editName').value.trim() || undefined,
+            phone: document.getElementById('editPhone').value.trim() || undefined,
+            company: document.getElementById('editCompany').value.trim() || undefined,
+            gst: document.getElementById('editGST').value.trim() || undefined,
+            designation: document.getElementById('editDesignation').value.trim() || undefined
+          };
+
+          // Remove undefined keys so backend doesn't overwrite with undefined
+          Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+          setButtonLoading('saveProfileBtn', true, 'Save');
+          try {
+            const data = await updateProfile(payload);
+            if (!data) return;
+
+            saveAuth(getToken(), data.user);
+            fillUser(data.user);
+            showToast('Profile updated successfully', 'success');
+
+            editWrap.hidden = true;
+            if (editBtn) editBtn.hidden = false;
+          } catch (err) {
+            setButtonLoading('saveProfileBtn', false, 'Save');
+            const msg = err && err.message ? err.message : String(err);
+
+            if (err && err.details && Array.isArray(err.details)) {
+              // Map backend fields to input ids
+              const map = {
+                name: 'editName',
+                phone: 'editPhone',
+                company: 'editCompany',
+                gst: 'editGST',
+                designation: 'editDesignation'
+              };
+              const errors = err.details;
+              errors.forEach(d => {
+                const id = map[d.field] || null;
+                if (id) showFieldError(id, d.message);
+              });
+
+              const first = errors[0] && map[errors[0].field] ? map[errors[0].field] : null;
+              if (first) {
+                const el = document.getElementById(first);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.focus();
+                }
+              }
+              return;
+            }
+
+            if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('connection')) {
+              showToast('Network error. Check your connection.', 'error');
+              return;
+            }
+
+            showToast(msg, 'error');
+          } finally {
+            setButtonLoading('saveProfileBtn', false, 'Save');
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+

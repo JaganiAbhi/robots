@@ -29,13 +29,27 @@ function animatePrice(el, target) {
 export function renderDetail(root, id) {
   const r = getRobotById(id);
   if (!r) {
-    root.innerHTML = `<section class="section"><p>Robot not found.</p><button type="button" class="detail-back" id="detail-fallback">← Back</button></section>`;
+    root.innerHTML = `
+      <div class="page-shell">
+        <section class="section section--tight-top">
+          <p>Robot not found.</p>
+          <button type="button" class="detail-back" id="detail-fallback">← Back to catalog</button>
+        </section>
+      </div>`;
     root.querySelector("#detail-fallback")?.addEventListener("click", () => navTo("/robots"));
     return;
   }
 
   root.innerHTML = `
-    <section class="section detail-page">
+    <div class="page-shell page-shell--detail">
+      <nav class="detail-breadcrumb reveal" aria-label="Breadcrumb">
+        <a href="#/" data-link>Home</a>
+        <span class="detail-breadcrumb__sep" aria-hidden="true">/</span>
+        <a href="#/robots" data-link>Robots</a>
+        <span class="detail-breadcrumb__sep" aria-hidden="true">/</span>
+        <span class="detail-breadcrumb__here">${r.name}</span>
+      </nav>
+    <section class="section detail-page section--tight-top">
       <button type="button" class="detail-back" id="detail-back">← Back to lineup</button>
       <div class="detail-hero reveal">
         <div class="detail-hero__visual">
@@ -87,9 +101,10 @@ export function renderDetail(root, id) {
       </div>
       <div class="detail-cta-row reveal">
         <button type="button" class="btn-gradient" id="detail-buy">Buy Now — <span id="detail-price">${formatPrice(0)}</span></button>
-        <a href="#/builder" class="btn-outline-glass" data-link>Customize This Robot</a>
+        <a href="#/builder" class="btn-outline-glass" data-link>Open in Config Studio</a>
       </div>
     </section>
+    </div>
   `;
 
   root.querySelector("#detail-back")?.addEventListener("click", () => navTo("/robots"));
