@@ -28,7 +28,7 @@ export function renderHome(root) {
           </div>
         </div>
         <div class="hero__right hero__right--spline reveal" style="position: relative; z-index: 2;">
-          <canvas id="spline-canvas" class="hero__spline-canvas" aria-hidden="true"></canvas>
+          <canvas id="spline-canvas" class="hero__spline-canvas" role="presentation"></canvas>
         </div>
       </section>
 

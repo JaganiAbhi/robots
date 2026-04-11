@@ -4,84 +4,112 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NEXUS — Intelligence. Embodied.</title>
+  <meta name="description" content="NEXUS — Browse, customise and order next-generation AI robots. Industrial, medical, personal and exploration bots available.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet" />
-  <!-- Single stylesheet — works from file:// when opened next to this folder -->
+  <link rel="icon" href="data:," />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="cursor-orb" class="cursor-orb" aria-hidden="true"></div>
+  <div id="cursor-orb"  class="cursor-orb"  aria-hidden="true"></div>
   <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
 
+  <!-- ── Site Header ───────────────────────────────────────────────────────── -->
   <header class="site-header" id="site-header">
     <div class="nav-inner">
       <a href="#/" class="wordmark" data-link>
-        <svg class="nexus-logo-svg" width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(61,255,181,0.6)); transition: transform 0.3s ease;">
+        <svg class="nexus-logo-svg" width="26" height="26" viewBox="0 0 40 40" fill="none"
+             style="filter:drop-shadow(0 0 8px rgba(61,255,181,0.6));transition:transform 0.3s ease">
           <defs>
             <linearGradient id="nexus-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#3dffb5" />
-              <stop offset="100%" stop-color="#ff4bd8" />
+              <stop offset="0%"   stop-color="#3dffb5"/>
+              <stop offset="100%" stop-color="#ff4bd8"/>
             </linearGradient>
             <linearGradient id="nexus-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#ff4bd8" />
-              <stop offset="100%" stop-color="#8a5cff" />
+              <stop offset="0%"   stop-color="#ff4bd8"/>
+              <stop offset="100%" stop-color="#8a5cff"/>
             </linearGradient>
           </defs>
           <path d="M20 4 L34 12 L34 28 L20 36 L6 28 L6 12 Z" stroke="url(#nexus-grad1)" stroke-width="3.5" stroke-linejoin="round"/>
-          <path d="M20 20 L20 36 M20 20 L34 12 M20 20 L6 12" stroke="url(#nexus-grad2)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 20 L20 36 M20 20 L34 12 M20 20 L6 12"  stroke="url(#nexus-grad2)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         NEXUS
       </a>
+
       <nav class="nav-center" aria-label="Primary">
-        <a href="#/" data-link>Home</a>
-        <a href="#/robots" data-link>Robots</a>
-        <a href="#/shop" data-link>Shop</a>
+        <a href="#/"        data-link>Home</a>
+        <a href="#/robots"  data-link>Robots</a>
+        <a href="#/shop"    data-link>Shop</a>
         <a href="#/builder" data-link>Builder</a>
-        <a href="#/faq" data-link>FAQ</a>
+        <a href="#/faq"     data-link>FAQ</a>
       </nav>
+
       <div class="nav-right">
-        <button type="button" class="cart-btn" id="theme-toggle" aria-label="Toggle theme">
-          <svg class="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        <!-- Theme toggle -->
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
         </button>
-        <button type="button" class="cart-btn" id="cart-btn" aria-label="Open cart">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M6 6h15l-1.5 9h-12z" />
-            <circle cx="9" cy="20" r="1.5" />
-            <circle cx="18" cy="20" r="1.5" />
-            <path d="M6 6 5 3H2" />
+
+        <!-- Cart -->
+        <button type="button" class="icon-btn cart-icon-btn" id="cart-btn" aria-label="Open cart" title="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>
+            <path d="M6 6 5 3H2"/>
           </svg>
           <span class="cart-badge" id="cart-badge">0</span>
         </button>
-        <a href="#/builder" class="btn-nav-cta" data-link>Get Started</a>
-        <button type="button" class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+
+        <!-- ── Auth slot (Login / Signup / User menu) — filled by JS ── -->
+        <div id="nav-auth-desktop" class="nav-auth-slot"></div>
+
+        <!-- Hamburger -->
+        <button type="button" class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
+
+    <!-- Mobile overlay -->
     <div class="mobile-overlay" id="mobile-overlay" hidden>
+      <button class="mobile-close" id="mobile-close" aria-label="Close menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
       <nav class="mobile-nav" aria-label="Mobile">
-        <a href="#/" data-link>Home</a>
-        <a href="#/robots" data-link>Robots</a>
-        <a href="#/shop" data-link>Shop</a>
-        <a href="#/builder" data-link>Builder</a>
-        <a href="#/faq" data-link>FAQ</a>
+        <a href="#/"        data-link>
+          <span class="mobile-nav__icon">🏠</span> Home
+        </a>
+        <a href="#/robots"  data-link>
+          <span class="mobile-nav__icon">🤖</span> Robots
+        </a>
+        <a href="#/shop"    data-link>
+          <span class="mobile-nav__icon">🛒</span> Shop
+        </a>
+        <a href="#/builder" data-link>
+          <span class="mobile-nav__icon">⚙️</span> Builder
+        </a>
+        <a href="#/faq"     data-link>
+          <span class="mobile-nav__icon">💬</span> FAQ
+        </a>
+        <!-- Mobile auth links — filled by JS -->
+        <div id="nav-auth-mobile"></div>
       </nav>
     </div>
   </header>
 
+  <!-- ── App root ───────────────────────────────────────────────────────────── -->
   <main id="app" class="app-main"></main>
 
+  <!-- ── Cart drawer ────────────────────────────────────────────────────────── -->
   <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
     <div class="cart-drawer__backdrop" id="cart-backdrop"></div>
     <div class="cart-drawer__panel">
@@ -97,6 +125,7 @@
     </div>
   </aside>
 
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
   <footer class="site-footer">
     <div class="footer-gradient-line"></div>
     <div class="footer-grid">
@@ -111,15 +140,15 @@
       </div>
       <div>
         <h4>Products</h4>
-        <a href="#/robots" data-link>Robot lineup</a>
-        <a href="#/shop" data-link>Shop</a>
+        <a href="#/robots"  data-link>Robot lineup</a>
+        <a href="#/shop"    data-link>Shop</a>
         <a href="#/builder" data-link>Custom builder</a>
       </div>
       <div>
         <h4>Company</h4>
-        <a href="#/faq" data-link>Support &amp; FAQ</a>
+        <a href="#/faq"    data-link>Support &amp; FAQ</a>
         <a href="#/robots" data-link>Enterprise</a>
-        <a href="#/shop" data-link>Financing</a>
+        <a href="#/shop"   data-link>Financing</a>
       </div>
       <div>
         <h4>Legal</h4>
@@ -131,7 +160,6 @@
     <p class="footer-copy">© 2026 NEXUS Robotics. All rights reserved.</p>
   </footer>
 
-  <!-- ES module app entry (works over http://127.0.0.1:5500) -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
