@@ -13,16 +13,16 @@ const orderRoutes = require('./routes/orderRoutes');
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+// Request logger
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${new Date().toISOString()} | ${req.method} ${req.url}`);
+  next();
+});
+
 // ── Security & Middleware ─────────────────────────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "img-src": ["'self'", "data:", "https:"],
-      "script-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://unpkg.com"],
-      "connect-src": ["'self'", "https://*.mongodb.net", "http://localhost:*", "http://127.0.0.1:*"],
-    },
-  },
+  crossOriginResourcePolicy: false,
+  contentSecurityPolicy: false,
 }));
 
 // Refined CORS

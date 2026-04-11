@@ -3,7 +3,7 @@
  * All calls automatically attach Bearer token from localStorage.
  */
 const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE = IS_DEV ? 'http://localhost:5000/api' : '/api';
+const BASE = (IS_DEV && window.location.port !== '5000' && window.location.port !== '') ? `http://localhost:5000/api` : '/api';
 
 function getToken() {
   return localStorage.getItem('nexus_token') || '';
