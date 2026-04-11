@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nexus-app
+    env: node
+    plan: free
+    # Since the codebase is in a specific folder structure:
+    buildCommand: "cd nexus-backend && npm install"
+    startCommand: "cd nexus-backend && node server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        # Render will prompt the user to enter their MongoDB URI securely
+        sync: false

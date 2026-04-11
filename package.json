@@ -1,0 +1,11 @@
+{
+  "name": "nexus-monolithic",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "cd nexus-backend && npm install",
+    "start": "cd nexus-backend && node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
