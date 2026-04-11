@@ -4,6 +4,7 @@ const express  = require('express');
 const cors     = require('cors');
 const mongoose = require('mongoose');
 const path     = require('path');
+const helmet   = require('helmet');
 
 const authRoutes  = require('./routes/authRoutes');
 const cartRoutes  = require('./routes/cartRoutes');
@@ -12,20 +13,37 @@ const orderRoutes = require('./routes/orderRoutes');
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Middleware ────────────────────────────────────────────────────────────────
-// Allow any localhost / 127.0.0.1 origin during development
-const ALLOWED_ORIGINS = /^(null|https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
+// ── Security & Middleware ─────────────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "https:"],
+      "script-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://unpkg.com"],
+      "connect-src": ["'self'", "https://*.mongodb.net", "http://localhost:*", "http://127.0.0.1:*"],
+    },
+  },
+}));
+
+// Refined CORS
+const ALLOWED_ORIGINS = [
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  'http://localhost:5001',
+  'http://127.0.0.1:5001',
+  'https://nexus-app.onrender.com' // Example production URL
+];
+
 app.use(cors({
   origin: (origin, cb) => {
-    // Allow if no origin (e.g. mobile apps, curl) or if origin is allowed
-    // For Render deployment, we might just allow all if we aren't strict, or we add production URL later.
-    // To make it easy, we will allow all in production.
-    if (!origin || ALLOWED_ORIGINS.test(origin) || process.env.NODE_ENV === 'production') return cb(null, true);
-    // As a fallback for Render deployment, just let it pass if not explicitly failing
-    return cb(null, true); 
+    if (!origin || ALLOWED_ORIGINS.includes(origin) || process.env.NODE_ENV !== 'production') {
+      return cb(null, true);
+    }
+    return cb(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
+
 app.use(express.json());
 
 // ── Routes ────────────────────────────────────────────────────────────────────
@@ -33,14 +51,33 @@ app.use('/api/auth',   authRoutes);
 app.use('/api/cart',   cartRoutes);
 app.use('/api/orders', orderRoutes);
 
-// Serve Static Frontend
-app.use(express.static(path.join(__dirname, '../public')));
-
 app.get('/api', (req, res) => res.json({ status: 'NEXUS API running ✅' }));
 
-// Catch-all route to serve index.html for SPA (if applicable) or default page
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+// ── Static Frontend ───────────────────────────────────────────────────────────
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
+
+// Handle SPA routing: serve index.html for any unknown non-API routes
+app.get('/*all', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
+
+// ── Error Handling ────────────────────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error(`[ERROR] ${new Date().toISOString()} | ${req.method} ${req.url}`);
+  console.error(err.stack);
+
+  const status = err.status || 500;
+  const message = process.env.NODE_ENV === 'production' 
+    ? 'An internal server error occurred.' 
+    : err.message;
+
+  res.status(status).json({
+    success: false,
+    message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
 // ── Database ──────────────────────────────────────────────────────────────────
