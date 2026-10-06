@@ -3,16 +3,16 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const publicDir = path.join(__dirname, 'public');
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files
+app.use(express.static(publicDir));
 
-// Serve index.html for all routes (SPA support)
+// SPA fallback
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Frontend server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
